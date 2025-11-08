@@ -54,7 +54,25 @@ def pedir_float(msg: str, minimo: float = None, maximo: float = None, default: f
         except ValueError:
             print("Ingrese un número válido (float).")
 
+def main():
+    gestor = GestorEstudios(
+        carpetas_base=["PPMI", "Sarcoma", "T2"],
+        dir_imagenes=IMG_DIR,
+    )
 
+    while True:
+        os.system("cls" if os.name == "nt" else "clear")
+        print("   PARCIAL 3 - Gestión DICOM y Procesamiento (OpenCV)")
+
+        print("1) Cargar SERIE DICOM (PPMI / Sarcoma / T2)")
+        print("2) Mostrar reconstrucción 3D (3 cortes ortogonales)")
+        print("3) Exportar información del estudio a CSV (DataFrame)")
+        print("4) Método de ZOOM (recorte + cuadro + mm + resize)")
+        print("5) Segmentación (binarización) de un corte")
+        print("6) Transformación morfológica sobre última segmentación")
+        print("7) Conversión de la serie a NIFTI")
+        print("8) Salir")
+        
 
 
 
