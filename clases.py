@@ -457,6 +457,7 @@ class EstudioImaginologico:
         )
         return carpeta_salida_abs
     
+
 # Clase GestorEstudios 
 
 class GestorEstudios:
