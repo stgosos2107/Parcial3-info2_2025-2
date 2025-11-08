@@ -475,3 +475,16 @@ class GestorEstudios:
         self.estudios: Dict[str, EstudioImaginologico] = {}
         self.estudio_actual_alias: Optional[str] = None
 
+
+    def buscar_series(self) -> List[str]:
+        """Busca recursivamente carpetas 'hoja' que contienen archivos .dcm."""
+        series: List[str] = []
+        for base in self.carpetas_base:
+            if not os.path.isdir(base):
+                continue
+            for raiz, _, files in os.walk(base):
+                if any(f.lower().endswith(".dcm") for f in files):
+                    series.append(raiz)
+        series = sorted(series, key=lambda p: (p.split(os.sep)[0].lower(), p.lower()))
+        return series
+
