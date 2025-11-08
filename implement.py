@@ -198,7 +198,24 @@ def main():
                 print(f"\n[ERROR] En la segmentación: {e}")
             pausar()
 
-            
+#Opcion de transformación morfológica
+        elif op == 6:
+            est = gestor.obtener_estudio_actual()
+            if est is None:
+                print("Primero cargue una serie (opción 1).")
+                pausar()
+                continue
+            try:
+                k = pedir_int("Tamaño de kernel (impar, ej. 3): ",
+                              minimo=1, default=3)
+                out, ruta_morf = est.transformacion_morfologica(kernel_size=k)
+                print("\nTransformación morfológica (apertura) guardada en:")
+                print("  ", ruta_morf)
+            except Exception as e:
+                print(f"\n[ERROR] En la transformación morfológica: {e}")
+            pausar()
+
+
 
 
 
