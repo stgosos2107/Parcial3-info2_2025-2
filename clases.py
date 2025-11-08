@@ -56,4 +56,52 @@ def _parse_time_hhmmss(tstr: str) -> Optional[datetime]:
     except Exception:
         return None
     
-    
+
+# Clase EstudioImaginologico 
+
+class EstudioImaginologico:
+    """
+    Clase principal para gestionar un estudio DICOM (una serie).
+
+    Atributos principales (del primer DICOM):
+        - study_date
+        - study_time
+        - study_modality
+        - study_description
+        - series_time
+        - study_duration_seconds  (SeriesTime - StudyTime)
+        - volume                  (matriz 3D reconstruida, shape = (Z,H,W))
+        - shape                   (Z,H,W)
+        - pixel_spacing           (row_mm, col_mm)
+        - slice_thickness         (mm)
+
+    Además:
+        - nombre_serie            (nombre corto de la carpeta)
+        - dir_imagenes            (carpeta donde se guardan las pruebas)
+        - ultima_segmentacion     (imagen y base del último corte segmentado)
+    """
+
+    def __init__(self, carpeta_serie: str, dir_imagenes: str = "imagenes_prueba") -> None:
+        self.carpeta_serie = os.path.abspath(carpeta_serie)
+        self.nombre_serie = os.path.basename(os.path.normpath(self.carpeta_serie))
+        self.dir_imagenes = asegurar_dir(dir_imagenes)
+
+        self.rutas: List[str] = []
+        self.datasets: List[pydicom.dataset.FileDataset] = []
+        self.volume: Optional[np.ndarray] = None
+        self.shape: Tuple[int, int, int] = (0, 0, 0)
+
+        # atributos de encabezado
+        self.study_date: str = ""
+        self.study_time: str = ""
+        self.study_modality: str = ""
+        self.study_description: str = ""
+        self.series_time: str = ""
+        self.study_duration_seconds: Optional[float] = None
+        self.pixel_spacing: Tuple[float, float] = (1.0, 1.0)
+        self.slice_thickness: float = 1.0
+
+        # para morfología (última segmentación realizada)
+        self.ultima_segmentacion: Optional[Tuple[np.ndarray, str]] = None
+
+        self._cargar_desde_carpeta()
