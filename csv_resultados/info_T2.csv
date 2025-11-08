@@ -1,0 +1,2 @@
+NombreSerie,CarpetaSerie,StudyDate,StudyTime,StudyModality,StudyDescription,SeriesTime,StudyDurationSeconds,Width_px,Height_px,NumSlices,PixelSpacing_row_mm,PixelSpacing_col_mm,SliceThickness_mm
+T2,C:\Users\santi\OneDrive\Desktop\Parcial3-info2_2025-2\T2,20061201,141645.000000,MR,"IRM cérébrale, neuro-crâne",142628.430000,583.0,512,512,44,0.44921875,0.44921875,5.0

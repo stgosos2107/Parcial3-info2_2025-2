@@ -1,0 +1,2 @@
+NombreSerie,CarpetaSerie,StudyDate,StudyTime,StudyModality,StudyDescription,SeriesTime,StudyDurationSeconds,Width_px,Height_px,NumSlices,PixelSpacing_row_mm,PixelSpacing_col_mm,SliceThickness_mm
+MPRAGE_GRAPPA,C:\Users\santi\OneDrive\Desktop\Parcial3-info2_2025-2\PPMI\3105\MPRAGE_GRAPPA,20110324,130458.843000,MR,Multi-center PD VB15A v3_0001^Parkinson_gating,134951.843000,2693.0,240,256,352,1.0,1.0,1.0
