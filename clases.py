@@ -409,3 +409,33 @@ class EstudioImaginologico:
         self.ultima_segmentacion = (seg, base_archivo)
 
         return seg, ruta_seg
+    
+    # Transformación morfológica (apertura) sobre la última segmentación
+    
+    def transformacion_morfologica(self, kernel_size: int = 3) -> Tuple[np.ndarray, str]:
+        """
+        Aplica una transformación morfológica de APERTURA (opening)
+        sobre la última segmentación realizada.
+        El usuario elige el tamaño de kernel.
+        La imagen resultante se guarda y se devuelve.
+        """
+        if self.ultima_segmentacion is None:
+            raise RuntimeError(
+                "No hay segmentación previa. Primero use la función de segmentación."
+            )
+
+        seg, base_archivo = self.ultima_segmentacion
+        g8 = a_uint8(seg)
+
+        k = max(1, int(kernel_size))
+        if k % 2 == 0:
+            k += 1
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (k, k))
+        out = cv2.morphologyEx(g8, cv2.MORPH_OPEN, kernel)
+
+        ruta_morf = os.path.join(
+            self.dir_imagenes,
+            f"{base_archivo}_prueba_morfologia_open_k{k}.png"
+        )
+        cv2.imwrite(ruta_morf, out)
+        return out, ruta_morf
