@@ -72,7 +72,46 @@ def main():
         print("6) Transformación morfológica sobre última segmentación")
         print("7) Conversión de la serie a NIFTI")
         print("8) Salir")
+        op = pedir_int("Seleccione opción: ", minimo=1, maximo=8)
+
+        if op == 1:
+            try:
+                series = gestor.buscar_series()
+                if not series:
+                    print("\nNo se encontraron series en PPMI / Sarcoma / T2.")
+                    pausar()
+                    continue
+
+                print("\nSeries disponibles:")
+                for i, s in enumerate(series, 1):
+                    print(f"  {i}. {s}")
+                sel = pedir_int("Seleccione la serie (número): ",
+                                minimo=1, maximo=len(series))
+                carpeta_serie = series[sel - 1]
+
+                alias = gestor.crear_estudio_desde_serie(carpeta_serie)
+                est = gestor.obtener_estudio_actual()
+
+                print(f"\nSerie cargada con alias: {alias}")
+                print(f"Carpeta: {est.carpeta_serie}")
+                print(f"Nombre serie: {est.nombre_serie}")
+                print(f"StudyDate: {est.study_date}")
+                print(f"StudyTime: {est.study_time}")
+                print(f"StudyModality: {est.study_modality}")
+                print(f"StudyDescription: {est.study_description}")
+                print(f"SeriesTime: {est.series_time}")
+                print(f"Duración (s): {est.study_duration_seconds}")
+                print(f"Shape matriz 3D (Z,H,W): {est.shape}")
+
+            except Exception as e:
+                print(f"\n[ERROR] No fue posible cargar la serie: {e}")
+            pausar()
+
         
+
+
+
+
 
 
 
