@@ -240,7 +240,7 @@ def main():
 
         # ----------------------------- 8) salir --------------------------
         elif op == 8:
-            print("\nSaliendo... ¡Éxitos en el parcial!")
+            print("\nSaliendo... ¡Profe ponganos 5!")
             break
 
 
