@@ -507,3 +507,9 @@ class GestorEstudios:
         self.estudio_actual_alias = alias
         return alias
 
+
+    def obtener_estudio_actual(self) -> Optional[EstudioImaginologico]:
+        """Devuelve el último estudio cargado (None si no hay)."""
+        if self.estudio_actual_alias is None:
+            return None
+        return self.estudios.get(self.estudio_actual_alias)
