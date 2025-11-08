@@ -107,6 +107,19 @@ def main():
                 print(f"\n[ERROR] No fue posible cargar la serie: {e}")
             pausar()
 
+        elif op == 2:
+            est = gestor.obtener_estudio_actual()
+            if est is None:
+                print("Primero cargue una serie (opción 1).")
+                pausar()
+                continue
+            try:
+                est.mostrar_cortes_ortogonales()
+                print("\nFigura de cortes 3D guardada en 'imagenes_prueba'.")
+            except Exception as e:
+                print(f"\n[ERROR] Al mostrar cortes 3D: {e}")
+            pausar()
+
         
 
 
