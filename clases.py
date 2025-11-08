@@ -270,3 +270,96 @@ class EstudioImaginologico:
 
         # Cerrar para liberar recursos
         display.close()
+    
+    # Método de ZOOM (recorte + rectángulo + texto en mm + resize)
+
+    def zoom_corte(
+        self,
+        idx: int,
+        x: int,
+        y: int,
+        w: int,
+        h: int,
+        factor_resize: float = 1.0
+    ) -> Dict[str, str]:
+        """
+        Método de "ZOOM" pedido en el parcial:
+
+        - Toma un corte de la matriz 3D.
+        - Convierte a imagen uint8 en ESCALA DE GRISES.
+        - Pasa a BGR para dibujar un rectángulo a color.
+        - Escribe las dimensiones del recorte en milímetros (usando PixelSpacing).
+        - Realiza un resize del recorte con OpenCV.
+        - Guarda:
+            * imagen original con el cuadro
+            * recorte redimensionado
+            * figura con dos subplots (original + recorte)
+        """
+        corte = self.obtener_corte(idx)
+        img_gray = a_uint8(gris_si_bgr(corte))
+        img_bgr = cv2.cvtColor(img_gray, cv2.COLOR_GRAY2BGR)
+
+        H, W = img_gray.shape
+        x = max(0, min(x, W - 1))
+        y = max(0, min(y, H - 1))
+        w = max(1, min(w, W - x))
+        h = max(1, min(h, H - y))
+
+        recorte = img_gray[y:y + h, x:x + w]
+
+        # Dimensiones físicas en mm
+        alto_mm = h * float(self.pixel_spacing[0])
+        ancho_mm = w * float(self.pixel_spacing[1])
+
+        # Dibujar rectángulo y texto
+        cv2.rectangle(img_bgr, (x, y), (x + w, y + h), (0, 255, 255), 2)
+        texto = f"{ancho_mm:.1f}mm x {alto_mm:.1f}mm"
+        cv2.putText(
+            img_bgr, texto, (x, max(20, y - 10)),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2, cv2.LINE_AA
+        )
+
+        # Resize del recorte
+        if factor_resize <= 0:
+            factor_resize = 1.0
+        recorte_resize = recorte
+        if abs(factor_resize - 1.0) > 1e-6:
+            recorte_resize = cv2.resize(
+                recorte, None, fx=factor_resize, fy=factor_resize,
+                interpolation=cv2.INTER_LINEAR
+            )
+
+        base_archivo = f"{self.nombre_serie}_corte{idx}"
+        rutas: Dict[str, str] = {}
+
+        # Guardar imagen original con cuadro
+        ruta_corte_cuadro = os.path.join(
+            self.dir_imagenes, f"{base_archivo}_prueba_corte_con_cuadro.png"
+        )
+        cv2.imwrite(ruta_corte_cuadro, img_bgr)
+        rutas["corte_con_cuadro"] = ruta_corte_cuadro
+
+        # Guardar recorte redimensionado
+        ruta_recorte = os.path.join(
+            self.dir_imagenes, f"{base_archivo}_prueba_recorte_resize.png"
+        )
+        cv2.imwrite(ruta_recorte, recorte_resize)
+        rutas["recorte_resize"] = ruta_recorte
+
+        # Figura con dos subplots (original + recorte)
+        fig, axes = plt.subplots(1, 2, figsize=(8, 4))
+        axes[0].imshow(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB))
+        axes[0].set_title("Corte con cuadro")
+        axes[0].axis("off")
+        axes[1].imshow(recorte_resize, cmap="gray")
+        axes[1].set_title("Recorte (resize)")
+        axes[1].axis("off")
+        plt.tight_layout()
+        ruta_panel = os.path.join(
+            self.dir_imagenes, f"{base_archivo}_prueba_zoom_panel.png"
+        )
+        fig.savefig(ruta_panel, bbox_inches="tight", dpi=120)
+        plt.close(fig)
+        rutas["panel_zoom"] = ruta_panel
+
+        return rutas
