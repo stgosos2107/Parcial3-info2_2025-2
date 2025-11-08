@@ -215,6 +215,33 @@ def main():
                 print(f"\n[ERROR] En la transformación morfológica: {e}")
             pausar()
 
+        elif op == 7:
+            est = gestor.obtener_estudio_actual()
+            if est is None:
+                print("Primero cargue una serie (opción 1).")
+                pausar()
+                continue
+            try:
+                carpeta = est.convertir_a_nifti(NIFTI_DIR)
+                print("\nConversión a NIFTI realizada.")
+                print("Archivos .nii/.nii.gz guardados en:")
+                print("  ", carpeta)
+            except Exception as e:
+                print(f"\n[ERROR] En la conversión a NIFTI: {e}")
+            pausar()
+
+        # ----------------------------- 8) salir --------------------------
+        elif op == 8:
+            print("\nSaliendo... ¡Éxitos en el parcial!")
+            break
+
+
+if _name_ == "_main_":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nInterrumpido por el usuario.")   
+
 
 
 
