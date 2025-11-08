@@ -488,3 +488,22 @@ class GestorEstudios:
         series = sorted(series, key=lambda p: (p.split(os.sep)[0].lower(), p.lower()))
         return series
 
+
+    def crear_estudio_desde_serie(self, carpeta_serie: str) -> str:
+        """
+        Crea un EstudioImaginologico a partir de la carpeta dada,
+        lo almacena internamente y devuelve un alias (nombre corto).
+        """
+        estudio = EstudioImaginologico(
+            carpeta_serie, dir_imagenes=self.dir_imagenes
+        )
+        alias_base = os.path.basename(os.path.normpath(carpeta_serie))
+        alias = alias_base
+        i = 2
+        while alias in self.estudios:
+            alias = f"{alias_base}_{i}"
+            i += 1
+        self.estudios[alias] = estudio
+        self.estudio_actual_alias = alias
+        return alias
+
