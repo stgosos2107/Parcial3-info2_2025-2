@@ -456,4 +456,21 @@ class EstudioImaginologico:
             reorient=True,
         )
         return carpeta_salida_abs
+    
+# Clase GestorEstudios 
+
+class GestorEstudios:
+    """
+    Sistema sencillo para gestionar y almacenar los objetos EstudioImaginologico
+    creados durante la ejecución del programa.
+    """
+
+    def __init__(self,
+                 carpetas_base: Optional[List[str]] = None,
+                 dir_imagenes: str = "imagenes_prueba") -> None:
+        # Carpetas donde buscar series DICOM (PPMI, Sarcoma, T2)
+        self.carpetas_base = carpetas_base or ["PPMI", "Sarcoma", "T2"]
+        self.dir_imagenes = dir_imagenes
+        self.estudios: Dict[str, EstudioImaginologico] = {}
+        self.estudio_actual_alias: Optional[str] = None
 
