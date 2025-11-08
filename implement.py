@@ -164,6 +164,41 @@ def main():
                 print(f"\n[ERROR] En el método de ZOOM: {e}")
             pausar()
 
+#Opcion de segmentación
+
+        elif op == 5:
+            est = gestor.obtener_estudio_actual()
+            if est is None:
+                print("Primero cargue una serie (opción 1).")
+                pausar()
+                continue
+            try:
+                idx = elegir_corte(est)
+                print("\nTipos de binarización disponibles:")
+                tipos = [
+                    "binario",
+                    "binario_invertido",
+                    "truncado",
+                    "tozero",
+                    "tozero_invertido",
+                ]
+                for i, t in enumerate(tipos, 1):
+                    print(f"  {i}. {t}")
+                sel = pedir_int("Seleccione tipo: ",
+                                minimo=1, maximo=len(tipos), default=1)
+                tipo = tipos[sel - 1]
+
+                thr = pedir_int("Umbral (0-255) [127]: ",
+                                minimo=0, maximo=255, default=127)
+                seg, ruta_seg = est.segmentar_corte(idx, tipo=tipo, thr=thr)
+                print("\nImagen segmentada guardada en:")
+                print("  ", ruta_seg)
+                print("La segmentación queda almacenada para usar en morfología (opción 6).")
+            except Exception as e:
+                print(f"\n[ERROR] En la segmentación: {e}")
+            pausar()
+
+            
 
 
 
