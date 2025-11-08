@@ -54,6 +54,14 @@ def pedir_float(msg: str, minimo: float = None, maximo: float = None, default: f
         except ValueError:
             print("Ingrese un número válido (float).")
 
+def elegir_corte(estudio: EstudioImaginologico) -> int:
+    """Lista los cortes y permite seleccionar uno por índice."""
+    print("\nCortes disponibles en la serie:")
+    for i in range(estudio.num_cortes()):
+        print(f"  {i}. {estudio.nombre_archivo(i)}")
+    idx = pedir_int("Seleccione el corte (número): ", minimo=0, maximo=estudio.num_cortes() - 1)
+    return idx
+
 def main():
     gestor = GestorEstudios(
         carpetas_base=["PPMI", "Sarcoma", "T2"],
