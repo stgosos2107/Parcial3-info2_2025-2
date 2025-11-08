@@ -139,6 +139,30 @@ def main():
                 print(f"\n[ERROR] Al guardar CSV: {e}")
             pausar()
 
+#Opcion de zoom
+        elif op == 4:
+            est = gestor.obtener_estudio_actual()
+            if est is None:
+                print("Primero cargue una serie (opción 1).")
+                pausar()
+                continue
+            try:
+                idx = elegir_corte(est)
+                print("\nParámetros del rectángulo (en píxeles):")
+                x = pedir_int("x [0]: ", default=0)
+                y = pedir_int("y [0]: ", default=0)
+                w = pedir_int("ancho w [64]: ", minimo=1, default=64)
+                h = pedir_int("alto  h [64]: ", minimo=1, default=64)
+                f = pedir_float("factor resize [1.0]: ",
+                                minimo=0.1, maximo=10.0, default=1.0)
+
+                rutas = est.zoom_corte(idx, x, y, w, h, factor_resize=f)
+                print("\nImágenes de ZOOM guardadas:")
+                for nombre, ruta in rutas.items():
+                    print(f"  {nombre}: {ruta}")
+            except Exception as e:
+                print(f"\n[ERROR] En el método de ZOOM: {e}")
+            pausar()
 
 
 
