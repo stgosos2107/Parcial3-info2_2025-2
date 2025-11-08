@@ -182,3 +182,47 @@ class EstudioImaginologico:
             self.study_duration_seconds = (t_series - t_study).total_seconds()
         else:
             self.study_duration_seconds = None
+
+    # Métodos de información y DataFrame
+
+    def num_cortes(self) -> int:
+        return len(self.datasets)
+
+    def nombre_archivo(self, idx: int) -> str:
+        ruta = self.rutas[idx]
+        return os.path.splitext(os.path.basename(ruta))[0]
+
+    def obtener_corte(self, idx: int) -> np.ndarray:
+        if self.volume is None:
+            raise RuntimeError("El volumen no se ha construido.")
+        if not (0 <= idx < self.volume.shape[0]):
+            raise IndexError("Índice de corte fuera de rango.")
+        return self.volume[idx, :, :]
+
+    def info_df(self) -> pd.DataFrame:
+        """Devuelve un DataFrame (una fila) con la información principal del estudio."""
+        if self.volume is None:
+            raise RuntimeError("El volumen no se ha construido.")
+        z, h, w = self.volume.shape  # (cortes, alto, ancho)
+        fila = {
+            "NombreSerie": self.nombre_serie,
+            "CarpetaSerie": self.carpeta_serie,
+            "StudyDate": self.study_date,
+            "StudyTime": self.study_time,
+            "StudyModality": self.study_modality,
+            "StudyDescription": self.study_description,
+            "SeriesTime": self.series_time,
+            "StudyDurationSeconds": self.study_duration_seconds,
+            # forma de la matriz 3D siguiendo el estilo del notebook NIfTI:
+            "Width_px": w,      # ancho
+            "Height_px": h,     # alto
+            "NumSlices": z,     # número de cortes
+            "PixelSpacing_row_mm": self.pixel_spacing[0],
+            "PixelSpacing_col_mm": self.pixel_spacing[1],
+            "SliceThickness_mm": self.slice_thickness,
+        }
+        return pd.DataFrame([fila])
+
+    def guardar_info_csv(self, ruta_csv: str) -> None:
+        df = self.info_df()
+        df.to_csv(ruta_csv, index=False)
