@@ -363,3 +363,49 @@ class EstudioImaginologico:
         rutas["panel_zoom"] = ruta_panel
 
         return rutas
+    
+    # Segmentación (umbralización con OpenCV)
+    
+    def segmentar_corte(
+        self,
+        idx: int,
+        tipo: str = "binario",
+        thr: int = 127,
+        maxval: int = 255
+    ) -> Tuple[np.ndarray, str]:
+        """
+        Segmenta un corte usando threshold de OpenCV.
+        Tipos soportados:
+            - binario
+            - binario_invertido
+            - truncado
+            - tozero
+            - tozero_invertido
+        Guarda la imagen segmentada en la carpeta de pruebas y
+        actualiza self.ultima_segmentacion.
+        """
+        corte = self.obtener_corte(idx)
+        g8 = a_uint8(gris_si_bgr(corte))
+
+        tipos = {
+            "binario": cv2.THRESH_BINARY,
+            "binario_invertido": cv2.THRESH_BINARY_INV,
+            "truncado": cv2.THRESH_TRUNC,
+            "tozero": cv2.THRESH_TOZERO,
+            "tozero_invertido": cv2.THRESH_TOZERO_INV,
+        }
+        flag = tipos.get(tipo.lower(), cv2.THRESH_BINARY)
+
+        _, seg = cv2.threshold(g8, int(thr), int(maxval), flag)
+
+        base_archivo = f"{self.nombre_serie}_corte{idx}"
+        ruta_seg = os.path.join(
+            self.dir_imagenes,
+            f"{base_archivo}_prueba_segmentacion_{tipo}.png"
+        )
+        cv2.imwrite(ruta_seg, seg)
+
+        # Guardamos para usar luego en morfología
+        self.ultima_segmentacion = (seg, base_archivo)
+
+        return seg, ruta_seg
