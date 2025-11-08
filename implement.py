@@ -249,14 +249,3 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         print("\nInterrumpido por el usuario.")   
-
-
-
-
-
-
-
-
-
-        
-
