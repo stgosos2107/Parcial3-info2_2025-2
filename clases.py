@@ -226,3 +226,47 @@ class EstudioImaginologico:
     def guardar_info_csv(self, ruta_csv: str) -> None:
         df = self.info_df()
         df.to_csv(ruta_csv, index=False)
+
+    # Reconstrucción 3D: cortes ortogonales usando nibabel + nilearn
+
+    def mostrar_cortes_ortogonales(self) -> None:
+        """
+        Muestra los tres planos (axial, sagital y coronal) como en el
+        archivo de visualización NIfTI, usando nilearn.plotting.plot_anat
+        con display_mode='ortho'.
+
+        - Se crea una imagen NIfTI temporal a partir de la matriz 3D.
+        - Se usa nibabel + nilearn para graficar los 3 planos.
+        - Se guarda la figura de los 3 cortes en 'imagenes_prueba'.
+        """
+        if self.volume is None:
+            raise RuntimeError("El volumen no se ha construido.")
+
+        # self.volume tiene forma (Z, H, W) = (cortes, alto, ancho)
+        vol = self.volume.astype(np.float32)
+
+        # Reordenar a (X, Y, Z) = (ancho, alto, cortes), como en NIfTI
+        data_nifti = np.transpose(vol, (2, 1, 0))  # (W, H, Z)
+
+        # Crear imagen NIfTI temporal con afinidad identidad
+        img_nii = nib.Nifti1Image(data_nifti, affine=np.eye(4))
+
+        # Graficar los 3 planos ortogonales
+        display = plotting.plot_anat(
+            img_nii,
+            display_mode='ortho',
+            title='Planos Axial, Sagital y Coronal'
+        )
+
+        # Guardar la figura de los 3 cortes como resultado de prueba
+        ruta_fig = os.path.join(
+            self.dir_imagenes,
+            f"{self.nombre_serie}_prueba_cortes3D.png"
+        )
+        display.savefig(ruta_fig)
+
+        # Mostrar en pantalla (como en el notebook)
+        plt.show()
+
+        # Cerrar para liberar recursos
+        display.close()
