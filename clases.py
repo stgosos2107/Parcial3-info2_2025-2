@@ -105,3 +105,80 @@ class EstudioImaginologico:
         self.ultima_segmentacion: Optional[Tuple[np.ndarray, str]] = None
 
         self._cargar_desde_carpeta()
+
+    def _cargar_desde_carpeta(self) -> None:
+        """Lee todos los DICOM de la carpeta, arma el volumen y llena los atributos."""
+        patrones = ["**/*.dcm", "**/*.DCM"]
+        encontrados: List[str] = []
+        for pat in patrones:
+            encontrados.extend(
+                glob.glob(os.path.join(self.carpeta_serie, pat), recursive=True)
+            )
+
+        if not encontrados:
+            raise FileNotFoundError(f"No se encontraron archivos DICOM en: {self.carpeta_serie}")
+
+        dsets: List[pydicom.dataset.FileDataset] = []
+        for ruta in sorted(encontrados):
+            try:
+                ds = pydicom.dcmread(ruta, force=True)
+                _ = ds.pixel_array  # valida que es imagen
+                ds.__ruta_archivo = ruta
+                dsets.append(ds)
+            except Exception:
+                continue
+
+        if not dsets:
+            raise RuntimeError("No hay cortes DICOM válidos en la carpeta indicada.")
+
+        # Ordenar por InstanceNumber o por posición Z
+        def clave_orden(ds):
+            if hasattr(ds, "InstanceNumber"):
+                try:
+                    return int(ds.InstanceNumber)
+                except Exception:
+                    pass
+            try:
+                return float(ds.ImagePositionPatient[-1])
+            except Exception:
+                pass
+            return os.path.basename(getattr(ds, "__ruta_archivo", ""))
+
+        dsets.sort(key=clave_orden)
+        self.datasets = dsets
+        self.rutas = [ds.__ruta_archivo for ds in dsets]
+
+        # Matriz 3D: (Z,H,W)  -> Z = número de cortes, H = alto, W = ancho
+        cortes = [ds.pixel_array.astype(np.float32) for ds in dsets]
+        self.volume = np.stack(cortes, axis=0)
+        self.shape = self.volume.shape  # (Z,H,W)
+
+        # Encabezados principales (del primer corte)
+        ds0 = dsets[0]
+        self.study_date = str(getattr(ds0, "StudyDate", ""))
+        self.study_time = str(getattr(ds0, "StudyTime", ""))
+        self.study_modality = str(getattr(ds0, "Modality", ""))
+        self.study_description = str(getattr(
+            ds0, "StudyDescription", getattr(ds0, "SeriesDescription", "")
+        ))
+        self.series_time = str(getattr(ds0, "SeriesTime", ""))
+
+        # Pixel spacing y slice thickness
+        try:
+            ps = ds0.PixelSpacing
+            self.pixel_spacing = (float(ps[0]), float(ps[1]))
+        except Exception:
+            self.pixel_spacing = (1.0, 1.0)
+
+        try:
+            self.slice_thickness = float(getattr(ds0, "SliceThickness", 1.0))
+        except Exception:
+            self.slice_thickness = 1.0
+
+        # Duración del estudio en segundos (SeriesTime - StudyTime)
+        t_study = _parse_time_hhmmss(self.study_time)
+        t_series = _parse_time_hhmmss(self.series_time)
+        if t_study is not None and t_series is not None:
+            self.study_duration_seconds = (t_series - t_study).total_seconds()
+        else:
+            self.study_duration_seconds = None
