@@ -439,3 +439,21 @@ class EstudioImaginologico:
         )
         cv2.imwrite(ruta_morf, out)
         return out, ruta_morf
+    
+    # Conversión a NIFTI
+
+    def convertir_a_nifti(self, carpeta_salida: str) -> str:
+        """
+        Convierte la carpeta de la serie DICOM a formato NIFTI,
+        usando dicom2nifti.convert_directory.
+        Devuelve la carpeta donde se guardaron los .nii/.nii.gz.
+        """
+        carpeta_salida_abs = asegurar_dir(carpeta_salida)
+        dicom2nifti.convert_directory(
+            self.carpeta_serie,
+            carpeta_salida_abs,
+            compression=True,
+            reorient=True,
+        )
+        return carpeta_salida_abs
+
