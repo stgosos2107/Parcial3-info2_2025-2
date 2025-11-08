@@ -74,6 +74,7 @@ def main():
         print("8) Salir")
         op = pedir_int("Seleccione opción: ", minimo=1, maximo=8)
 
+#Opcion para cargar series
         if op == 1:
             try:
                 series = gestor.buscar_series()
@@ -107,6 +108,7 @@ def main():
                 print(f"\n[ERROR] No fue posible cargar la serie: {e}")
             pausar()
 
+#opcion para mostrar cortes 3D
         elif op == 2:
             est = gestor.obtener_estudio_actual()
             if est is None:
@@ -120,7 +122,24 @@ def main():
                 print(f"\n[ERROR] Al mostrar cortes 3D: {e}")
             pausar()
 
-        
+
+#info del estudio a CSV
+        elif op == 3:
+            est = gestor.obtener_estudio_actual()
+            if est is None:
+                print("Primero cargue una serie (opción 1).")
+                pausar()
+                continue
+            try:
+                nombre_base = est.nombre_serie.replace(" ", "_")
+                ruta_csv = os.path.join(CSV_DIR, f"info_{nombre_base}.csv")
+                est.guardar_info_csv(ruta_csv)
+                print(f"\nInformación del estudio guardada en:\n  {ruta_csv}")
+            except Exception as e:
+                print(f"\n[ERROR] Al guardar CSV: {e}")
+            pausar()
+
+
 
 
 
