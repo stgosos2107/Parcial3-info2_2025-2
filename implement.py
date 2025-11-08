@@ -161,7 +161,7 @@ def main():
                 y = pedir_int("y [0]: ", default=0)
                 w = pedir_int("ancho w [64]: ", minimo=1, default=64)
                 h = pedir_int("alto  h [64]: ", minimo=1, default=64)
-                f = pedir_float("factor resize [1.0]: ",
+                f = pedir_float("factor resize de 0 a 1: ",
                                 minimo=0.1, maximo=10.0, default=1.0)
 
                 rutas = est.zoom_corte(idx, x, y, w, h, factor_resize=f)
